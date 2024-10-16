@@ -1,6 +1,6 @@
 import React from 'react'
 import { ChevronLeft, ChevronRight, Heart, Play } from 'lucide-react';
-
+import axios from "../axios/axios"
 function Likes() {
  
   const songs = [

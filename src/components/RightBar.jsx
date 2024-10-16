@@ -1,12 +1,15 @@
 import React from 'react';
 import { X, UserCircle2, Settings } from 'lucide-react';
+import { useEffect, useState } from "react";
+const RightBar = ({open, setOpen}) => {
 
-const RightBar = () => {
+
   return (
-    <div className="bg-black text-white p-4 w-64 rounded-lg h-[100vh]">
+    open && (
+      <div className="bg-black text-white p-4 w-64 rounded-lg h-[100vh]">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-lg font-semibold">Friend Activity</h2>
-        <X className="cursor-pointer" size={20} />
+        <X onClick={() => setOpen(false)} className="cursor-pointer" size={20} />
       </div>
       
       <p className="text-sm mb-4">
@@ -30,7 +33,11 @@ const RightBar = () => {
         SETTINGS
       </button>
     </div>
-  );
-};
+    )
+  )
+   
+  }
+  
+
 
 export default RightBar;
