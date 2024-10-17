@@ -26,7 +26,7 @@ function App() {
         }
       ></Route>
       <Route
-        path="/playlist"
+        path="/playlist/:id"
         element={
           <MainLoyaut>
             <Playlist></Playlist>

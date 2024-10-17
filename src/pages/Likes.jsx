@@ -1,6 +1,7 @@
 import React from 'react'
 import { ChevronLeft, ChevronRight, Heart, Play } from 'lucide-react';
 import axios from "../axios/axios"
+import { useNavigate } from 'react-router-dom';
 function Likes() {
  
   const songs = [

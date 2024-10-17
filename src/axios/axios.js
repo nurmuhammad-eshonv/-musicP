@@ -1,8 +1,8 @@
 import axios from 'axios';
 
 // Spotify API-ga autentifikatsiya uchun ma'lumotlar
-const CLIENT_ID = '817048509986412b9444e9ddfac1545a';
-const CLIENT_SECRET = '4b25d21db7684f1e97259657ca027628';
+const CLIENT_ID = '7283734ed5d546859a182f94dfce18a8';
+const CLIENT_SECRET = 'a3e9674182bd4c77843b524ad072f35a';
 
 // Token olish funktsiyasi
 const getToken = async () => {

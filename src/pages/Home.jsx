@@ -1,45 +1,93 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useState } from "react";
 import React from "react";
-import axios from "../axios/axios"
+import axios from "../axios/axios";
+import { useNavigate } from "react-router-dom";
 
 function Home() {
-  
-  const [token, setToken] = useState(localStorage.getItem("access_token") || "");
+  const navigate = useNavigate();
 
-  const CLIENT_ID = "7283734ed5d546859a182f94dfce18a8";
-  const CLIENT_SECRET = "a3e9674182bd4c77843b524ad072f35a";
+  const [data, setData] = useState([]);
+  const [mixesData, setMixesData] = useState([]);
+  const [madeData, setMadeData] = useState([]);
+  const [playedData, setPlayedData] = useState([]);
+  const [jumpData, setJumpData] = useState([]);
+  const [yoursData, setYoursData] = useState([]);
 
-  const getToken = async () => {
+  console.log(data);
+
+  const fetchDataOne = async () => {
     try {
-      const response = await fetch("https://accounts.spotify.com/api/token", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-          Authorization: `Basic ${btoa(CLIENT_ID + ":" + CLIENT_SECRET)}`,
-        },
-        body: "grant_type=client_credentials",
-      });
+      const response = await axios.get("/browse/featured-playlists");
+      setData(response.data.playlists.items);
+    } catch (error) {
+      console.log("Xato yuz berdi:", error);
+    }
+  };
 
-      const auth = await response.json();
-      const newToken = `${auth.token_type} ${auth.access_token}`;
-      localStorage.setItem("access_token", newToken);
-      setToken(newToken);
-    } catch (err) {
-      console.error(err);
+  const fetchDataTwo = async () => {
+    try {
+      const response = await axios.get("/browse/categories/toplists/playlists");
+      setMixesData(response.data.playlists.items);
+      // console.log(response.data.playlists.items);
+    } catch (error) {
+      console.log("Xato yuz berdi:", error);
+    }
+  };
+
+  const fetchDataThree = async () => {
+    try {
+      const response = await axios.get(
+        "/browse/categories/0JQ5DAqbMKFHOzuVTgTizF/playlists"
+      );
+      setMadeData(response.data.playlists.items);
+      console.log(response);
+    } catch (error) {
+      console.log("Xato yuz berdi:", error);
+    }
+  };
+
+  const fetchDataFour = async () => {
+    try {
+      const response = await axios.get(
+        "/browse/categories/0JQ5DAqbMKFQ00XGBls6ym/playlists"
+      );
+      setPlayedData(response.data.playlists.items);
+    } catch (error) {
+      console.log("Xato yuz berdi:", error);
+    }
+  };
+
+  const fetchDataFive = async () => {
+    try {
+      const response = await axios.get(
+        "/browse/categories/0JQ5DAqbMKFLVaM30PMBm4/playlists"
+      );
+      setJumpData(response.data.playlists.items);
+    } catch (error) {
+      console.log("Xato yuz berdi:", error);
+    }
+  };
+
+  const fetchDataSix = async () => {
+    try {
+      const response = await axios.get(
+        "/browse/categories/0JQ5DAqbMKFCbimwdOYlsl/playlists"
+      );
+      setYoursData(response.data.playlists.items);
+    } catch (error) {
+      console.log("Xato yuz berdi:", error);
     }
   };
 
   useEffect(() => {
-    if (!token) {
-      getToken();
-    }
-  }, [token]);
-
-  
-  // axios.get("/v1/browse/categories/toplists/playlists")
-  // .then(res => console.log(res)
-  // )
+    fetchDataOne();
+    fetchDataTwo();
+    fetchDataThree();
+    fetchDataFour();
+    fetchDataFive();
+    fetchDataSix();
+  }, []);
 
   return (
     <div className="bg-gradient-to-b from-blue-950 to-gray-950 text-white p-8">
@@ -55,25 +103,27 @@ function Home() {
         />
       </div>
 
-      {/* Good Afternoon Section */}
       <div>
         <h1 className="text-3xl font-bold">Good afternoon</h1>
         <div className="flex flex-wrap gap-4 mt-6">
-          {[...Array(3)].map((_, idx) => (
-            <div
-              key={idx}
-              className="bg-[#1c3772] w-[479px] rounded-[10px] flex items-center space-x-4"
-            >
-              <div className="w-[74px] h-full">
-                <img
-                  className="rounded-[10px]"
-                  src="https://picsum.photos/400"
-                  alt="title"
-                />
+          {data?.slice(0, 6).map((item, index) => {
+            return (
+              <div
+                onClick={() => navigate(`/playlist/${item.id}`)}
+                key={index}
+                className="bg-[#1c3772] w-[479px] rounded-[10px] flex items-center space-x-4"
+              >
+                <div className="w-[74px] h-full">
+                  <img
+                    className="rounded-[10px]"
+                    src={item.images[0]?.url || "https://picsum.photos/400"}
+                    alt="title"
+                  />
+                </div>
+                <div className="font-semibold">{item.name}</div>
               </div>
-              <div className="font-semibold">title</div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 
@@ -84,40 +134,168 @@ function Home() {
           <span className="cursor-pointer hover:underline">See All</span>
         </div>
         <div className="flex flex-wrap gap-8 mt-4">
-          {[...Array(4)].map((_, idx) => (
-            <div
-              key={idx}
-              className="bg-[#161838] w-[224px] h-[324px] p-4 rounded-lg"
-            >
-              <div className="w-full h-[182px] bg-black rounded-md mb-4"></div>
-              <div className="font-semibold mb-1">title</div>
-              <div className="text-sm text-gray-400">
-                Hey Violet, Khalid, more
+          {mixesData?.slice(0, 4).map((item, index) => {
+            const maxLength = 20; // Masalan, 50 ta harf bilan cheklash
+            const truncatedDescription =
+              item.description.length > maxLength
+                ? item.description.slice(0, maxLength) + "... and more"
+                : item.description;
+            return (
+              <div
+                onClick={() => navigate(`/playlist/${item.id}`)}
+                key={index}
+                className="bg-[#161838] w-[224px] h-[324px] p-4 rounded-lg"
+              >
+                <div className="w-full h-[182px] bg-black rounded-md mb-4">
+                  <img
+                    src={item.images[0]?.url || "https://picsum.photos/400"}
+                    alt=""
+                  />
+                </div>
+                <div className="font-semibold mb-1">{item.name}</div>
+                <div className="text-sm text-gray-400">
+                  {truncatedDescription}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 
-      {/* Made for You Section */}
       <div className="mt-8">
         <div className="flex justify-between items-center">
           <h2 className="text-2xl font-semibold">Made for you</h2>
           <span className="cursor-pointer hover:underline">See All</span>
         </div>
-        <div className="grid grid-cols-5 gap-4 mt-4">
-          {["Folk Mix", "Daily Mix 1", "Daily Mix 5", "Pop Mix", "Indie Mix"].map(
-            (title, index) => (
+        <div className="flex flex-wrap gap-8 mt-4">
+          {madeData?.slice(0, 4).map((item, index) => {
+            const maxLength = 20; // Masalan, 50 ta harf bilan cheklash
+            const truncatedDescription =
+              item.description.length > maxLength
+                ? item.description.slice(0, maxLength) + "... and more"
+                : item.description;
+            return (
               <div
+                onClick={() => navigate(`/playlist/${item.id}`)}
                 key={index}
-                className="bg-gray-800 hover:bg-gray-700 p-4 rounded-lg"
+                className="bg-[#161838] w-[224px] h-[324px] p-4 rounded-lg"
               >
-                <div className="w-full h-32 bg-black rounded-md mb-4"></div>
-                <div className="font-semibold mb-1">{title}</div>
-                <div className="text-sm text-gray-400">Curated for you</div>
+                <div className="w-full h-[182px] bg-black rounded-md mb-4">
+                  <img
+                    src={item.images[0]?.url || "https://picsum.photos/400"}
+                    alt=""
+                  />
+                </div>
+                <div className="font-semibold mb-1">{item.name}</div>
+                <div className="text-sm text-gray-400">
+                  {truncatedDescription}
+                </div>
               </div>
-            )
-          )}
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="mt-8">
+        <div className="flex justify-between items-center">
+          <h2 className="text-2xl font-semibold">Recently played</h2>
+          <span className="cursor-pointer hover:underline">See All</span>
+        </div>
+        <div className="flex flex-wrap gap-8 mt-4">
+          {playedData?.slice(0, 4).map((item, index) => {
+            const maxLength = 20; // Masalan, 50 ta harf bilan cheklash
+            const truncatedDescription =
+              item.description.length > maxLength
+                ? item.description.slice(0, maxLength) + "... and more"
+                : item.description;
+            return (
+              <div
+                onClick={() => navigate(`/playlist/${item.id}`)}
+                key={index}
+                className="bg-[#161838] w-[224px] h-[324px] p-4 rounded-lg"
+              >
+                <div className="w-full h-[182px] bg-black rounded-md mb-4">
+                  <img
+                    src={item.images[0]?.url || "https://picsum.photos/400"}
+                    alt=""
+                  />
+                </div>
+                <div className="font-semibold mb-1">{item.name}</div>
+                <div className="text-sm text-gray-400">
+                  {truncatedDescription}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="mt-8">
+        <div className="flex justify-between items-center">
+          <h2 className="text-2xl font-semibold">Jump back in</h2>
+          <span className="cursor-pointer hover:underline">See All</span>
+        </div>
+        <div className="flex flex-wrap gap-8 mt-4">
+          {jumpData?.slice(0, 4).map((item, index) => {
+            const maxLength = 20;
+            const truncatedDescription =
+              item.description.length > maxLength
+                ? item.description.slice(0, maxLength) + "... and more"
+                : item.description;
+            return (
+              <div
+              onClick={() => navigate(`/playlist/${item.id}`)}
+
+                key={index}
+                className="bg-[#161838] w-[224px] h-[324px] p-4 rounded-lg"
+              >
+                <div className="w-full h-[182px] bg-black rounded-md mb-4">
+                  <img
+                    src={item.images[0]?.url || "https://picsum.photos/400"}
+                    alt=""
+                  />
+                </div>
+                <div className="font-semibold mb-1">{item.name}</div>
+                <div className="text-sm text-gray-400">
+                  {truncatedDescription}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="mt-8">
+        <div className="flex justify-between items-center">
+          <h2 className="text-2xl font-semibold">UNIQUELY YOURS:</h2>
+          <span className="cursor-pointer hover:underline">See All</span>
+        </div>
+        <div className="flex flex-wrap gap-8 mt-4">
+          {yoursData?.slice(0, 4).map((item, index) => {
+            const maxLength = 20;
+            const truncatedDescription =
+              item.description.length > maxLength
+                ? item.description.slice(0, maxLength) + "... and more"
+                : item.description;
+            return (
+              <div
+                onClick={() => navigate(`/playlist/${item.id}`)}
+                key={index}
+                className="bg-[#161838] w-[224px] h-[324px] p-4 rounded-lg"
+              >
+                <div className="w-full h-[182px] bg-black rounded-md mb-4">
+                  <img
+                    src={item.images[0]?.url || "https://picsum.photos/400"}
+                    alt=""
+                  />
+                </div>
+                <div className="font-semibold mb-1">{item.name}</div>
+                <div className="text-sm text-gray-400">
+                  {truncatedDescription}
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>
@@ -125,6 +303,3 @@ function Home() {
 }
 
 export default Home;
-
-
-
