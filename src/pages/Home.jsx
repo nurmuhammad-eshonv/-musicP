@@ -2,12 +2,11 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect, useState } from "react";
 import React from "react";
 import axios from "../axios/axios";
-import { useNavigate } from "react-router-dom"; 
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { useNavigate } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { getToken } from "../axios/axios";
 function Home() {
-
   const success = () => toast.success("now you can see all albums");
   const navigate = useNavigate();
 
@@ -18,33 +17,32 @@ function Home() {
   const [jumpData, setJumpData] = useState([]);
   const [yoursData, setYoursData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [counter, setCounter] = useState(1)
+  const [counter, setCounter] = useState(1);
 
-  const [all, setAll] = useState(4)
-  const [all1, setAll1] = useState(4)
-  const [all2, setAll2] = useState(4)
-  const [all3, setAll3] = useState(4)
-  const [all4, setAll4] = useState(4)
+  const [all, setAll] = useState(4);
+  const [all1, setAll1] = useState(4);
+  const [all2, setAll2] = useState(4);
+  const [all3, setAll3] = useState(4);
+  const [all4, setAll4] = useState(4);
 
   const fetchDataOne = async () => {
     try {
       const response = await axios.get("/browse/featured-playlists");
       setData(response.data.playlists.items);
-      
+
       // Explicitly checking if the status code is 401
       if (response.status === 401) {
         throw new Error("401");
       }
     } catch (error) {
       if (error.response && error.response.status === 401) {
-        getToken(); 
-        setCounter(counter + 1)
+        getToken();
+        setCounter(counter + 1);
       } else {
-        console.log("Xato yuz berdi:", error); 
+        console.log("Xato yuz berdi:", error);
       }
     }
   };
-  
 
   const fetchDataTwo = async () => {
     try {
@@ -123,11 +121,12 @@ function Home() {
         <div className="animate-spin rounded-full h-80 w-80 border-t-2 border-b-2 border-white"></div>
       </div>
     );
-  }  
-
+  }
 
   return (
-    <div className={`bg-gradient-to-b from-blue-950 to-gray-950 text-white p-8 `}>
+    <div
+      className={`bg-gradient-to-b from-blue-950 to-gray-950 text-white p-8 `}
+    >
       {/* Navigation Controls */}
       <ToastContainer />
       <div className="flex items-center space-x-4 mb-8">
@@ -168,7 +167,15 @@ function Home() {
       <div className="mt-8">
         <div className="flex justify-between items-center">
           <h2 className="text-2xl font-semibold">Your top mixes</h2>
-          <span onClick={() => {setAll(8); success()}} className="cursor-pointer hover:underline">See All</span>
+          <span
+            onClick={() => {
+              setAll(8);
+              success();
+            }}
+            className="cursor-pointer hover:underline"
+          >
+            See All
+          </span>
         </div>
         <div className="flex flex-wrap gap-8 mt-4">
           {mixesData?.slice(0, all).map((item, index) => {
@@ -202,7 +209,15 @@ function Home() {
       <div className="mt-8">
         <div className="flex justify-between items-center">
           <h2 className="text-2xl font-semibold">Made for you</h2>
-          <span onClick={() => {setAll4(8) ; success()}} className="cursor-pointer hover:underline">See All</span>
+          <span
+            onClick={() => {
+              setAll4(8);
+              success();
+            }}
+            className="cursor-pointer hover:underline"
+          >
+            See All
+          </span>
         </div>
         <div className="flex flex-wrap gap-8 mt-4">
           {madeData?.slice(0, all4).map((item, index) => {
@@ -236,7 +251,15 @@ function Home() {
       <div className="mt-8">
         <div className="flex justify-between items-center">
           <h2 className="text-2xl font-semibold">Recently played</h2>
-          <span onClick={() => {setAll1(8); success()}} className="cursor-pointer hover:underline">See All</span>
+          <span
+            onClick={() => {
+              setAll1(8);
+              success();
+            }}
+            className="cursor-pointer hover:underline"
+          >
+            See All
+          </span>
         </div>
         <div className="flex flex-wrap gap-8 mt-4">
           {playedData?.slice(0, all1).map((item, index) => {
@@ -270,7 +293,15 @@ function Home() {
       <div className="mt-8">
         <div className="flex justify-between items-center">
           <h2 className="text-2xl font-semibold">Jump back in</h2>
-          <span onClick={() => {setAll2(8); success()}} className="cursor-pointer hover:underline">See All</span>
+          <span
+            onClick={() => {
+              setAll2(8);
+              success();
+            }}
+            className="cursor-pointer hover:underline"
+          >
+            See All
+          </span>
         </div>
         <div className="flex flex-wrap gap-8 mt-4">
           {jumpData?.slice(0, all2).map((item, index) => {
@@ -281,8 +312,7 @@ function Home() {
                 : item.description;
             return (
               <div
-              onClick={() => navigate(`/playlist/${item.id}`)}
-
+                onClick={() => navigate(`/playlist/${item.id}`)}
                 key={index}
                 className="cursor-pointer bg-[#161838] w-[224px] h-[324px] p-4 rounded-lg"
               >
@@ -305,7 +335,15 @@ function Home() {
       <div className="mt-8">
         <div className="flex justify-between items-center">
           <h2 className="text-2xl font-semibold">UNIQUELY YOURS:</h2>
-          <span onClick={() => {setAll3(8); success()}} className="cursor-pointer hover:underline">See All</span>
+          <span
+            onClick={() => {
+              setAll3(8);
+              success();
+            }}
+            className="cursor-pointer hover:underline"
+          >
+            See All
+          </span>
         </div>
         <div className="flex flex-wrap gap-8 mt-4">
           {yoursData?.slice(0, all3).map((item, index) => {

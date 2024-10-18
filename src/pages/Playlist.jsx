@@ -18,6 +18,8 @@ function Playlist() {
   const [audio] = useState(new Audio());
   const [likedSongs, setLikedSongs] = useState(new Set());
   const [counter, setCounter] = useState(0);
+  const [likedStorage, setLikedStorage] = useState([])
+
   
   const users = useSelector((state) => state.users);
   const dispatch = useDispatch();
@@ -83,9 +85,16 @@ function Playlist() {
 
 const toggleLike = (song,) => {
   const newLikedSongs = new Set(likedSongs);
+
+  const likedSongsArray = [...newLikedSongs]; // Convert Set to an array
+  localStorage.setItem('likedSongs', JSON.stringify(likedSongsArray)); // Store in localStorage
+  
+  
+
+
+  
   
   if (newLikedSongs.has(song.track.id)) {
-    console.log(`Removing ${song.track.name} from liked songs`);
     newLikedSongs.delete(song.track.id);
     error()
 
@@ -94,6 +103,7 @@ const toggleLike = (song,) => {
     console.log(`Adding ${song.track.name} to liked songs`);
     newLikedSongs.add(song.track.id);
     dispatch({ type: "ADD", payload: song });
+
     success()
   }
 
