@@ -1,33 +1,142 @@
-import React, { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, Heart, Play } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import { ChevronLeft, ChevronRight, Heart, Play } from "lucide-react";
 import axios from "../axios/axios";
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from "react-router-dom";
+import BottomBar from "../components/BottomBar";
+import { useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
+import { ToastContainer, toast } from "react-toastify";
 
 function Playlist() {
-  const { id } = useParams();
-  const [playlist, setPlaylist] = useState(null); // Will hold the entire playlist object
+  const success = () => toast.success("added successfully");
+  const error = () => toast.error("already added to likes page");
+
+  const [playlist, setPlaylist] = useState(null);
   const [songs, setSongs] = useState([]);
+  const [currentTrack, setCurrentTrack] = useState(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [audio] = useState(new Audio());
+  const [likedSongs, setLikedSongs] = useState(new Set());
+  const [counter, setCounter] = useState(0);
+  
+  const users = useSelector((state) => state.users);
+  const dispatch = useDispatch();
+  const { id } = useParams();
 
   const fetchData = async () => {
     try {
       const response = await axios.get(`/playlists/${id}`);
-      setPlaylist(response.data); // Full playlist object
-      setSongs(response.data.tracks.items); // Songs are in tracks.items array
+      setPlaylist(response.data);
+      setSongs(response.data.tracks.items);
+      if (response.status === 401) {
+        throw new Error("401");
+      }
     } catch (error) {
-      console.log("Xato yuz berdi:", error);
+      if (error.response && error.response.status === 401) {
+        getToken();
+        setCounter(counter + 1)
+      } else {
+        console.log("Xato yuz berdi:", error);
+      }
     }
   };
 
   useEffect(() => {
     fetchData();
-  }, [id]);
+  }, [id, counter]);
 
-  if (!playlist) return   <div className="flex justify-center items-center h-screen bg-gray-100">
-  <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-green-500"></div>
-</div> // Loading state while data is being fetched
+  useEffect(() => {
+    return () => {
+      audio.pause();
+    };
+  }, [audio]);
+
+  const playTrack = (track) => {
+    if (currentTrack === track) {
+      if (audio.paused) {
+        audio.play();
+        setIsPlaying(true);
+      } else {
+        audio.pause();
+        setIsPlaying(false);
+      }
+    } else {
+      audio.src = track.preview_url;
+      audio.play();
+      setCurrentTrack(track);
+      setIsPlaying(true);
+    }
+  };
+
+  const handlePlayPause = () => {
+    if (currentTrack) {
+      if (isPlaying) {
+        audio.pause();
+        setIsPlaying(false);
+      } else {
+        audio.play();
+        setIsPlaying(true);
+      }
+    }
+  };
+
+
+const toggleLike = (song,) => {
+  const newLikedSongs = new Set(likedSongs);
+  
+  if (newLikedSongs.has(song.track.id)) {
+    console.log(`Removing ${song.track.name} from liked songs`);
+    newLikedSongs.delete(song.track.id);
+    error()
+
+    dispatch({ type: "DELETE", payload: index }); 
+  } else {
+    console.log(`Adding ${song.track.name} to liked songs`);
+    newLikedSongs.add(song.track.id);
+    dispatch({ type: "ADD", payload: song });
+    success()
+  }
+
+  setLikedSongs(newLikedSongs);
+};
+
+  const loaderCSS = `
+    .loader {
+      width: 20px;
+      aspect-ratio: 1;
+      display: flex;
+      justify-content: space-between;
+      animation: l4-0 .2s infinite alternate;
+    }
+    .loader::before,
+    .loader::after {
+      content: "";
+      width: 25%;
+      background: #1DB954;
+      animation: l4-1 .9s infinite alternate;
+    }
+    @keyframes l4-0 {
+      0%    {transform: scaleY(1)}
+      100%  {transform: scaleY(.4)}
+    }
+    @keyframes l4-1 {
+      0%    {transform: scaleY(.4)}
+      100%  {transform: scaleY(1)}
+    }
+  `;
+
+  if (!playlist)
+    return (
+      <div className="flex justify-center items-center h-screen bg-green-900">
+        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-green-500"></div>
+      </div>
+    );
 
   return (
     <div className="min-h-screen text-white bg-gradient-to-b from-green-900 to-black p-8">
+      <style>{loaderCSS}</style>
+      <ToastContainer />
+
       <header className="flex justify-between items-center mb-8">
         <div className="flex space-x-4">
           <ChevronLeft className="hover:bg-slate-500 transition-all rounded-[50%] cursor-pointer" size={24} />
@@ -44,13 +153,15 @@ function Playlist() {
           {playlist.images[0] ? (
             <img src={playlist.images[0].url} alt="Playlist Cover" className="w-60 h-60" />
           ) : (
-            <Heart className='cursor-pointer' size={80} color="white" />
+            <Heart className="cursor-pointer" size={80} color="white" />
           )}
         </div>
         <div>
           <p className="text-sm">PUBLIC PLAYLIST</p>
           <h1 className="text-7xl font-bold mb-6">{playlist.name}</h1>
-          <p className="text-sm">{playlist.owner.display_name} • {songs.length} songs</p>
+          <p className="text-sm">
+            {playlist.owner.display_name} • {songs.length} songs
+          </p>
         </div>
       </div>
 
@@ -73,23 +184,46 @@ function Playlist() {
 
       <div className="space-y-4">
         {songs.map((song, index) => (
-          <div key={song.track.id} className="grid grid-cols-[auto,2fr,2fr,1fr] items-center text-gray-300 hover:bg-gray-800/50 p-2 rounded group">
-            <span className="w-8">{index + 1}</span>
+          <div
+            key={song.track.id}
+            className="grid grid-cols-[auto,2fr,2fr,1fr] items-center text-gray-300 hover:bg-gray-800/50 p-2 rounded group"
+            onClick={() => playTrack(song.track)}
+          >
+            <span className="w-8">
+              {currentTrack === song.track && isPlaying ? (
+                <div className="loader"></div>
+              ) : (
+                index + 1
+              )}
+            </span>
             <div className="flex items-center">
               <img src={song.track.album.images[0]?.url} alt={song.track.name} className="w-10 h-10 mr-4" />
               <div>
                 <p className="text-white">{song.track.name}</p>
-                <p className="text-sm">{song.track.artists.map(artist => artist.name).join(', ')}</p>
+                <p className="text-sm">{song.track.artists.map((artist) => artist.name).join(", ")}</p>
               </div>
             </div>
             <span>{song.track.album.name}</span>
             <div className="flex items-center justify-between">
-              <Heart size={16} className="cursor-pointer opacity-0 group-hover:opacity-100" />
+              <Heart
+                onClick={() => toggleLike(song)}
+                size={16}
+                className={`cursor-pointer ${likedSongs.has(song.track.id) ? "text-red-600" : ""}`}
+              />
               <span>{new Date(song.added_at).toLocaleDateString()}</span>
             </div>
           </div>
         ))}
       </div>
+
+      {/* BottomBar component */}
+      <BottomBar
+        currentTrack={currentTrack}
+        isPlaying={isPlaying}
+        handlePlayPause={handlePlayPause}
+        setIsPlaying={setIsPlaying}
+        audio={audio}
+      />
     </div>
   );
 }

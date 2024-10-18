@@ -2,38 +2,41 @@ import React from "react";
 import Likes from "./pages/Likes";
 import Home from "./pages/Home";
 import Playlist from "./pages/Playlist";
-import MainLoyaut from "./layout/MainLayout";
+import MainLayout from "./layout/MainLayout";
 
-// Routes
-import { Routes, Route } from "react-router-dom";
+// Import BrowserRouter
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+
 function App() {
   return (
-    <Routes>
-      <Route
-        path="/"
-        element={
-          <MainLoyaut>
-            <Home></Home>
-          </MainLoyaut>
-        }
-      ></Route>
-      <Route
-        path="/likes"
-        element={
-          <MainLoyaut>
-            <Likes></Likes>
-          </MainLoyaut>
-        }
-      ></Route>
-      <Route
-        path="/playlist/:id"
-        element={
-          <MainLoyaut>
-            <Playlist></Playlist>
-          </MainLoyaut>
-        }
-      ></Route>
-    </Routes>
+    <Router>
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <MainLayout>
+              <Home />
+            </MainLayout>
+          }
+        />
+        <Route
+          path="/likes"
+          element={
+            <MainLayout>
+              <Likes />
+            </MainLayout>
+          }
+        />
+        <Route
+          path="/playlist/:id"
+          element={
+            <MainLayout>
+              <Playlist />
+            </MainLayout>
+          }
+        />
+      </Routes>
+    </Router>
   );
 }
 

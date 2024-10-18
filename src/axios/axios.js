@@ -5,7 +5,7 @@ const CLIENT_ID = '7283734ed5d546859a182f94dfce18a8';
 const CLIENT_SECRET = 'a3e9674182bd4c77843b524ad072f35a';
 
 // Token olish funktsiyasi
-const getToken = async () => {
+export const getToken = async () => {
   try {
     const response = await fetch('https://accounts.spotify.com/api/token', {
       method: 'POST',
